@@ -1,10 +1,13 @@
+import os
+import dj_database_url
 from pathlib import Path
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "dev-only-change-me"
-ALLOWED_HOSTS = ['*']
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG_MODE")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+ALLOWED_HOSTS = [host.strip() for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",") if host.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin", 
@@ -51,14 +54,11 @@ TEMPLATES = [
 ]
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST' : '192.168.254.88',
-        'PORT' : '3306',
-        'NAME': 'tablego_db',
-        'USER' : 'root',
-        'PASSWORD' : '',
-    },
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
