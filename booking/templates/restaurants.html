@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="restaurant-page" aria-labelledby="restaurant-list-heading">
+  <div class="section-heading listing-heading">
+    <div>
+      <h1 id="restaurant-list-heading">Choose a Restaurant</h1>
+      <p class="mu">Select a restaurant where you want to reserve a table.</p>
+    </div>
+    <a class="text-link" href="{% url 'home' %}{% if user.is_staff %}?browse=1{% endif %}"><i class="ri-arrow-left-line" aria-hidden="true"></i> Back home</a>
+  </div>
+  <p class="eyebrow">{{ restaurants|length }} restaurants available</p>
+  <br>
+  {% include "_cards.html" %}
+</section>
+{% endblock %}

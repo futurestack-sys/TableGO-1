@@ -1,0 +1,51 @@
+{% extends "dash_base.html" %}
+
+{% block heading %}
+<h1>Reservation Management</h1>
+<p>Confirm or decline customer reservations</p>
+{% endblock %}
+
+{% block body %}
+<div class="reservation-management">
+  <section class="reservation-controls" aria-label="Reservation filters">
+    <div class="reservation-controls-copy">
+      <span class="eyebrow">Queue</span>
+      <h2>Review reservations</h2>
+      <p>Filter bookings by status or restaurant, then confirm or decline pending requests.</p>
+    </div>
+    <form method="get" class="dashboard-filters reservation-filters">
+      <label>
+        Status
+        <select name="status" onchange="this.form.submit()">
+          <option value="">All statuses</option>
+          <option value="pending" {% if status == "pending" %}selected{% endif %}>Pending</option>
+          <option value="confirmed" {% if status == "confirmed" %}selected{% endif %}>Confirmed</option>
+          <option value="declined" {% if status == "declined" %}selected{% endif %}>Declined</option>
+          <option value="cancelled" {% if status == "cancelled" %}selected{% endif %}>Cancelled</option>
+        </select>
+      </label>
+      <label>
+        Restaurant
+        <select name="r" onchange="this.form.submit()">
+          <option value="">All restaurants</option>
+          {% for r in rests %}
+            <option value="{{ r.slug }}"{% if r.slug == slug %} selected{% endif %}>{{ r.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <noscript><button class="dk sm" type="submit">Apply filters</button></noscript>
+    </form>
+  </section>
+
+  <section class="box reservation-table-panel">
+    <div class="bh">
+      <div>
+        <span class="bh-kicker">Reservations</span>
+        <h3>Booking requests</h3>
+      </div>
+      <a class="bh-action" href="{% url 'dashboard' %}"><i class="ri-arrow-left-line" aria-hidden="true"></i> Dashboard</a>
+    </div>
+    {% include "_rtable.html" %}
+  </section>
+</div>
+{% endblock %}

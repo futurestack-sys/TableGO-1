@@ -1,0 +1,99 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Dashboard · TableGO</title>
+	<link rel="icon" type="image/svg+xml" href="{% static 'booking/img/tablego-icon.svg' %}">
+	<link rel="stylesheet" href="{% static 'fonts/remixicon.css' %}">
+	<link rel="stylesheet" href="{% static 'booking/site.css' %}?v=4">
+</head>
+
+<body>
+	<div class="dash">
+		<aside class="side" aria-label="Dashboard navigation">
+			<div class="logo" href="{% url 'dashboard' %}" aria-label="TableGO dashboard">
+				{% include "_logo.html" %}<b>Table<span>GO</span></b>
+				<small>RESTAURANT</small>
+				<em>Restaurant Reservation System</em>
+			</div>
+			<button class="side-menu-toggle" type="button" aria-expanded="false" aria-controls="side-nav">
+				<span class="menu-icon" aria-hidden="true"></span>
+				Menu
+			</button>
+			<nav class="side-nav" id="side-nav">
+				<div class="side-nav-section">
+					<a class="{% if nav == 'dashboard' %}on{% endif %}" href="{% url 'dashboard' %}"{% if nav == 'dashboard' %} aria-current="page"{% endif %}><i class="ri-dashboard-line" aria-hidden="true"></i><span>Dashboard</span></a>
+				</div>
+				<div class="side-nav-section side-nav-section-management">
+					<a class="{% if nav == 'reservations' %}on{% endif %}" href="{% url 'd_reservations' %}"{% if nav == 'reservations' %} aria-current="page"{% endif %}><i class="ri-calendar-check-line" aria-hidden="true"></i><span>Reservation Management</span></a>
+					{% if is_admin %}
+						<a class="{% if nav == 'restaurants' %}on{% endif %}" href="{% url 'd_restaurants' %}"{% if nav == 'restaurants' %} aria-current="page"{% endif %}>
+							<i class="ri-store-2-line" aria-hidden="true"></i><span>Restaurant Management</span>
+						</a>
+					{% endif %}
+					<a class="{% if nav == 'tables' %}on{% endif %}" href="{% url 'd_tables' %}"{% if nav == 'tables' %} aria-current="page"{% endif %}><i class="ri-layout-grid-line" aria-hidden="true"></i><span>Table Management</span></a>
+					{% if is_admin %}
+						<a class="{% if nav == 'accounts' %}on{% endif %}" href="{% url 'd_customers' %}"{% if nav == 'accounts' %} aria-current="page"{% endif %}>
+							<i class="ri-group-line" aria-hidden="true"></i><span>Account Management</span>
+						</a>
+					{% endif %}
+				</div>
+				<div class="side-nav-section side-nav-section-utility">
+					{% if is_admin %}
+						<a href="{% url 'home' %}?browse=1">
+							<i class="ri-arrow-go-forward-line" aria-hidden="true"></i>
+							<span>Go to website</span>
+						</a>
+					{% endif %}
+					<button type="button" data-logout-trigger><i class="ri-logout-box-r-line" aria-hidden="true"></i><span>Logout</span></button>
+				</div>
+			</nav>
+		</aside>
+
+		<main class="content">
+			<header class="dtop">
+				<div>
+					{% block heading %}
+					{% endblock %}
+				</div>
+				<b>{% if is_admin %}Admin{% else %}Manager{% endif %} · {{ user.username }}</b>
+			</header>
+
+			<div class="dbody">
+				{% for m in messages %}
+					<div class="msg {{ m.tags }}">
+						{{ m }}
+					</div>
+				{% endfor %}
+				{% block body %}
+				{% endblock %}
+			</div>
+		</main>
+	</div>
+
+	<script>
+		const menuButton = document.querySelector(".side-menu-toggle");
+		const sideNav = document.querySelector("#side-nav");
+		menuButton.addEventListener("click", () => {
+			const isExpanded = menuButton.getAttribute("aria-expanded") === "true";
+			menuButton.setAttribute("aria-expanded", String(!isExpanded));
+			sideNav.classList.toggle("open", !isExpanded);
+		});
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+				menuButton.setAttribute("aria-expanded", "false");
+				sideNav.classList.remove("open");
+				menuButton.focus();
+			}
+		});
+	</script>
+	{% if user.is_authenticated %}
+		{% include "_modal.html" %}
+	{% endif %}
+</body>
+
+</html>

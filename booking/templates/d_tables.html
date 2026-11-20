@@ -1,0 +1,95 @@
+{% extends "dash_base.html" %}
+
+{% block heading %}
+<h1>Table Management</h1>
+<p>Edit seats and positions on the floor plan</p>
+{% endblock %}
+
+{% block body %}
+<div class="management-toolbar">
+{% if rests|length > 1 %}
+  <nav class="restaurant-switcher" aria-label="Choose restaurant">
+    {% for r in rests %}
+      <a class="{% if r == cur %}on{% endif %}" href="?r={{ r.slug }}"{% if r == cur %} aria-current="page"{% endif %}>{{ r.name }}</a>
+    {% endfor %}
+  </nav>
+{% endif %}
+<a class="ghostd" href="{% url 'dashboard' %}"><i class="ri-arrow-left-line" aria-hidden="true"></i> Dashboard</a>
+</div>
+
+{% if cur %}
+  <div class="table-management">
+    <section class="box floor-plan-card">
+      <div class="bh">
+        <div>
+          <span class="bh-kicker">Current setup</span>
+          <h3>{{ cur.name }} · floor plan</h3>
+        </div>
+      </div>
+      <div class="floor-plan-content">
+        {% include "_plan.html" with rest=cur %}
+      </div>
+    </section>
+
+    <section class="box table-list-card">
+      <div class="bh">
+        <div>
+          <span class="bh-kicker">Table details</span>
+          <h3>Edit tables</h3>
+        </div>
+        <span class="table-count">{{ tables|length }} table{{ tables|length|pluralize }}</span>
+      </div>
+      <div class="tw table-editor-wrap">
+        <table class="dt table-editor">
+          <thead>
+            <tr>
+              <th scope="col">Table</th>
+              <th scope="col">Seats</th>
+              <th scope="col">x</th>
+              <th scope="col">y</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in tables %}
+              <tr>
+                <td>{{ t.name }} <span class="mu">({{ t.get_shape_display }})</span></td>
+                <td><input form="table-form-{{ t.pk }}" name="seats" type="number" min="1" max="30" value="{{ t.seats }}"></td>
+                <td><input form="table-form-{{ t.pk }}" name="x" type="number" min="0" max="100" value="{{ t.x }}"></td>
+                <td><input form="table-form-{{ t.pk }}" name="y" type="number" min="0" max="100" value="{{ t.y }}"></td>
+                <td>
+                  <form id="table-form-{{ t.pk }}" method="post" class="table-row-actions">
+                    {% csrf_token %}
+                    <input type="hidden" name="r" value="{{ cur.slug }}">
+                    <input type="hidden" name="pk" value="{{ t.pk }}">
+                    <button class="dk sm" type="submit" name="action" value="edit_table">Save</button>
+                    <button class="cancel sm" type="submit" name="action" value="del_table">Remove</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="mu" style="text-align: center;">No tables yet. Add the first table below.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="box add-table-card" id="add-table">
+      <div class="bh">
+        <div>
+          <span class="bh-kicker">Floor plan setup</span>
+          <h3>Add a table</h3>
+        </div>
+      </div>
+      <form method="post" class="add-table-form">
+        {% csrf_token %}
+        <input type="hidden" name="r" value="{{ cur.slug }}">
+        <input type="hidden" name="action" value="add_table">
+        {{ form.as_p }}
+        <button class="gold" type="submit"><i class="ri-add-line" aria-hidden="true"></i> Add table</button>
+      </form>
+    </section>
+  </div>
+{% endif %}
+{% endblock %}

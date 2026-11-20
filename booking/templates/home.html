@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="hero" aria-labelledby="home-title" style="--hero-image: url('{% static 'booking/img/chloe.jpg' %}')">
+  <div class="hero-logo" aria-hidden="true">
+    {% include "_logo.html" %}
+  </div>
+  <div class="hero-copy">
+    <h1 id="home-title">Restaurant<br>Reservation System</h1>
+    <p>Choose from our {{ restaurants|length }} exceptional restaurants, reserve your table, and enjoy a memorable dining experience.</p>
+  </div>
+</section>
+
+<section id="restaurant-collection" class="restaurant-collection" aria-labelledby="restaurant-heading">
+  <div class="section-heading">
+    <div>
+      <h2 id="restaurant-heading">Featured restaurants</h2>
+    </div>
+  </div>
+  {% include "_f_cards.html" %}
+</section>
+{% endblock %}

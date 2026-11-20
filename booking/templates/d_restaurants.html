@@ -1,0 +1,96 @@
+{% extends "dash_base.html" %}
+{% load static %}
+
+{% block heading %}
+<h1>Restaurant Management</h1>
+<p>Manage all restaurant branches in the system</p>
+{% endblock %}
+
+{% block body %}
+<section class="box restaurant-management">
+  <div class="bh">
+    <div>
+      <span class="bh-kicker">Locations</span>
+      <h3>Our Restaurants</h3>
+    </div>
+    <a class="bh-action" href="{% url 'dashboard' %}"><i class="ri-arrow-left-line" aria-hidden="true"></i> Dashboard</a>
+  </div>
+  <div class="cards">
+    {% for r in rows %}
+      <article class="rcard{% if not r.active %} inactive{% endif %}">
+        <div class="ph" style="background-image:url('{% static 'booking/img/'|add:r.slug|add:'.jpg' %}')">
+          <span class="badge {% if r.active %}on{% else %}off{% endif %}">{% if r.active %}Active{% else %}Inactive{% endif %}</span>
+        </div>
+        <div class="rb">
+          <div class="restaurant-details">
+            <h3>{{ r.name }}</h3>
+            <p class="mu restaurant-description">{{ r.description }}</p>
+            <p><i class="ri-map-pin-line" aria-hidden="true"></i> {{ r.location }}</p>
+            <p><i class="ri-restaurant-line" aria-hidden="true"></i> {{ r.cuisine }}</p>
+            <p><i class="ri-time-line" aria-hidden="true"></i> Open: {{ r.hours }}</p>
+          </div>
+          <div class="card-actions">
+            <a class="dk sm" href="{% url 'd_tables' %}?r={{ r.slug }}"><i class="ri-layout-grid-line" aria-hidden="true"></i> Tables</a>
+            <a class="gold sm" href="{% url 'admin:booking_restaurant_change' r.pk %}"><i class="ri-edit-line" aria-hidden="true"></i> Edit</a>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="pk" value="{{ r.pk }}">
+              <button class="cancel sm" type="submit">{% if r.active %}Deactivate{% else %}Activate{% endif %}</button>
+            </form>
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="restaurant-operations">
+  <section class="box restaurant-overview">
+    <div class="bh">
+      <div>
+        <span class="bh-kicker">At a glance</span>
+        <h3>Restaurant Overview</h3>
+      </div>
+    </div>
+    <div class="tw">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th scope="col">Restaurant</th>
+            <th scope="col">Tables</th>
+            <th scope="col">Today</th>
+            <th scope="col">Pending</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+            <tr>
+              <td><a href="{% url 'd_tables' %}?r={{ r.slug }}">{{ r.name }}</a></td>
+              <td>{{ r.nt }}</td>
+              <td>{{ r.today }}</td>
+              <td>{{ r.pend }}</td>
+              <td><span class="badge {% if r.active %}on{% else %}off{% endif %}">{% if r.active %}Active{% else %}Inactive{% endif %}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="box restaurant-add" id="add-restaurant">
+    <div class="bh">
+      <div>
+        <span class="bh-kicker">New location</span>
+        <h3><i class="ri-add-line" aria-hidden="true"></i> Add Restaurant</h3>
+      </div>
+    </div>
+    <form method="post" class="restaurant-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="gold" type="submit"><i class="ri-add-line" aria-hidden="true"></i> Add restaurant</button>
+    </form>
+  </section>
+</div>
+{% endblock %}
