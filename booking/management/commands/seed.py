@@ -1,6 +1,7 @@
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from booking.layouts import FIXTURES, GENERIC, GENERIC_FIXTURES, LAYOUTS
-from booking.models import Restaurant, Table
+from booking.models import Restaurant, RestaurantManager, Table
 
 DATA = {
     "Khloe Cafeteria + Cafe": (
@@ -44,4 +45,11 @@ class Command(BaseCommand):
             r.table_set.exclude(name__in=[x[0] for x in rows]).filter(reservation__isnull=True).delete()
             for tn, seats, shape, x, y in rows:
                 Table.objects.update_or_create(restaurant=r, name=tn, defaults=dict(seats=seats, shape=shape, x=x, y=y))
-        self.stdout.write(self.style.SUCCESS("Seeded restaurants and table layouts. No accounts were created."))
+            u, _ = User.objects.get_or_create(username="manager_" + slug.replace("-", ""))
+            u.set_password("manager123"); u.save()
+            RestaurantManager.objects.get_or_create(user=u, defaults=dict(restaurant=r))
+        if not User.objects.filter(username="admin").exists():
+            User.objects.create_superuser("admin", "admin@example.com", "admin12345")
+        if not User.objects.filter(username="customer").exists():
+            User.objects.create_user("customer", password="customer123")
+        self.stdout.write(self.style.SUCCESS("Seeded. See README for logins."))
